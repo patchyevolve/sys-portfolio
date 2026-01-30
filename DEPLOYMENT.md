@@ -1,8 +1,10 @@
 # Deployment Guide
 
-## 🚀 Ready for Deployment!
+## 🎉 **SUCCESSFULLY DEPLOYED!**
 
-Your Flask portfolio is now build-ready and optimized for deployment on various platforms.
+**🚀 Live Portfolio**: [https://sys-port-patchy.up.railway.app/](https://sys-port-patchy.up.railway.app/)
+
+Your Flask portfolio is now live and accessible worldwide!
 
 ## 📁 Files Included in Repository:
 

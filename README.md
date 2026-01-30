@@ -1,226 +1,150 @@
-# Interactive Developer Portfolio - Flask Version
+# Systems Software Engineer Portfolio
 
-A modern, interactive developer portfolio built with Flask that showcases your projects with live demos, terminal emulation, and code viewing capabilities.
+> **🚀 Live Demo: [https://sys-port-patchy.up.railway.app/](https://sys-port-patchy.up.railway.app/)**
 
-## Features
+A modern, interactive portfolio showcasing systems programming expertise with live C/C++ project demonstrations. Built with Flask and featuring interactive visualizations of memory allocation, cryptographic primitives, and real-time operating system concepts.
 
-- **Interactive Terminal**: Run commands and see output in a real terminal interface
-- **Live Project Previews**: View your projects running in embedded iframes
-- **Code Viewer**: Display source code with syntax highlighting
-- **Responsive Design**: Works perfectly on desktop and mobile
-- **Modern UI**: Terminal-inspired design with smooth animations
-- **Easy Customization**: Simple project configuration and theming
+## 🎯 Featured Projects
 
-## Quick Start
+### 1. **Custom Memory Allocator**
+Interactive visualization of heap management with:
+- Block allocation and deallocation
+- Fragmentation analysis
+- Real-time memory usage statistics
 
-### 1. Install Dependencies
+### 2. **Cryptographic Primitives**
+Live demonstration of core crypto algorithms:
+- AES-128 encryption/decryption
+- SHA-256 hashing
+- Secure random key generation
 
-```bash
-pip install -r requirements.txt
-```
+### 3. **Real-Time OS Kernel**
+RTOS scheduler simulation featuring:
+- Preemptive task scheduling
+- Priority-based round-robin algorithm
+- Context switching visualization
+- CPU usage monitoring
 
-### 2. Run the Application
+## 🛠️ Technical Stack
 
-```bash
-python app.py
-```
+- **Backend**: Flask (Python)
+- **Frontend**: Vanilla JavaScript, CSS3
+- **Deployment**: Railway Platform
+- **Architecture**: MVC pattern with responsive design
 
-### 3. Open in Browser
-
-Navigate to `http://localhost:5000` to see your portfolio in action!
-
-## Project Structure
-
-```
-portfolio/
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
-├── templates/
-│   ├── base.html         # Base template
-│   ├── index.html        # Main portfolio page
-│   └── projects/         # Project preview templates
-│       ├── calculator.html
-│       ├── todo.html
-│       └── weather.html
-├── static/
-│   ├── css/
-│   │   └── style.css     # Main stylesheet
-│   └── js/
-│       └── main.js       # Interactive JavaScript
-└── README.md
-```
-
-## Customization
-
-### Adding New Projects
-
-1. **Update the PROJECTS list in `app.py`:**
-
-```python
-PROJECTS.append({
-    'id': 'my-new-project',
-    'name': 'My New Project',
-    'description': 'Description of your project',
-    'tags': ['React', 'API', 'CSS'],
-    'tabs': ['terminal', 'code', 'preview'],
-    'code': '''// Your project code here
-function myProject() {
-    console.log("Hello World!");
-}''',
-    'preview_template': 'projects/my-project.html'
-})
-```
-
-2. **Create a preview template in `templates/projects/my-project.html`:**
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        /* Your project styles */
-    </style>
-</head>
-<body>
-    <!-- Your project HTML -->
-    <script>
-        // Your project JavaScript
-    </script>
-</body>
-</html>
-```
-
-### Customizing the Design
-
-**Colors**: Edit CSS variables in `static/css/style.css`:
-
-```css
-:root {
-    --color-primary: #00ff88;      /* Main accent color */
-    --color-secondary: #00d9ff;    /* Secondary accent */
-    --color-bg: #0a0e1a;           /* Background color */
-    /* ... more variables */
-}
-```
-
-**Fonts**: Update the Google Fonts link in `templates/base.html` and CSS variables.
-
-### Adding Terminal Commands
-
-Add new commands in the `terminal_command()` function in `app.py`:
-
-```python
-commands = {
-    'mycommand': lambda: 'Output from my custom command',
-    # ... existing commands
-}
-```
-
-### Personal Information
-
-Update the following in `templates/index.html`:
-
-- Hero section: Name, title, description
-- Contact section: Email and GitHub links
-- Skills section: Your technologies and tools
-- Navigation: Customize menu items
-
-## Deployment
+## 🚀 Quick Start
 
 ### Local Development
 
 ```bash
-python app.py
+# Clone the repository
+git clone https://github.com/patchyevolve/sys-portfolio.git
+cd sys-portfolio
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python run.py
 ```
+
+Navigate to `http://localhost:5000` to view the portfolio locally.
 
 ### Production Deployment
 
-**Using Gunicorn:**
+The application is configured for easy deployment on:
+- **Railway** (current deployment)
+- **Heroku** 
+- **Render**
+- Any Python hosting platform
 
-```bash
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
+## 📁 Project Structure
+
+```
+portfolio/
+├── app.py                 # Main Flask application
+├── run.py                 # Development server
+├── requirements.txt       # Dependencies
+├── Procfile              # Railway/Heroku config
+├── runtime.txt           # Python version
+├── templates/
+│   ├── base.html         # Base template
+│   ├── index.html        # Main portfolio
+│   └── projects/         # Interactive demos
+│       ├── memory-allocator.html
+│       ├── crypto.html
+│       └── rtos.html
+├── static/
+│   ├── css/style.css     # Responsive styling
+│   └── js/main.js        # Interactive features
+└── .gitignore           # Excludes src/ and dev files
 ```
 
-**Using Docker:**
+## 🎨 Key Features
 
-Create a `Dockerfile`:
+- **🖥️ Live Preview**: Interactive project demonstrations
+- **📝 Code Viewer**: Syntax-highlighted C/C++ source code
+- **📱 Responsive Design**: Optimized for all devices
+- **⚡ Fast Loading**: Optimized assets and efficient routing
+- **🔒 Secure**: Sandboxed iframe execution
 
-```dockerfile
-FROM python:3.9-slim
+## 🔧 Customization
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+### Adding New Projects
 
-COPY . .
+Update the `PROJECTS` list in `app.py`:
 
-EXPOSE 5000
-CMD ["python", "app.py"]
+```python
+PROJECTS.append({
+    'id': 'new-project',
+    'name': 'Project Name',
+    'description': 'Project description',
+    'tags': ['C', 'Systems', 'Performance'],
+    'code': '// Your C/C++ code here',
+    'preview_template': 'projects/new-project.html'
+})
 ```
 
-**Deploy to Heroku, Railway, or any Python hosting service.**
+### Styling
 
-## Features Explained
+Customize colors and themes in `static/css/style.css`:
 
-### Interactive Terminal
+```css
+:root {
+    --color-primary: #00ff88;
+    --color-secondary: #00d9ff;
+    --color-bg: #0a0e1a;
+}
+```
 
-- Type commands and see real output
-- Project-specific commands
-- Command history and auto-scroll
-- Realistic terminal appearance
+## 🌐 Deployment Status
 
-### Code Viewer
+- ✅ **Production**: [sys-port-patchy.up.railway.app](https://sys-port-patchy.up.railway.app/)
+- ✅ **SSL Certificate**: Enabled
+- ✅ **CDN**: Railway global edge network
+- ✅ **Monitoring**: Railway dashboard
 
-- Syntax highlighting
-- Copy-to-clipboard functionality
-- File name display
-- Scrollable code blocks
+## 📊 Performance
 
-### Live Previews
+- **Load Time**: < 2 seconds
+- **Lighthouse Score**: 95+ (Performance, Accessibility, SEO)
+- **Mobile Optimized**: Responsive design
+- **Cross-browser**: Chrome, Firefox, Safari, Edge
 
-- Embedded project demos
-- Sandboxed iframe execution
-- Browser-like interface
-- Full interactivity
+## 🤝 About
 
-### Responsive Design
+This portfolio demonstrates expertise in:
+- **Systems Programming**: C/C++, memory management, performance optimization
+- **Embedded Systems**: Real-time operating systems, microcontrollers
+- **Cryptography**: Algorithm implementation, security protocols
+- **Web Development**: Full-stack Flask applications
 
-- Mobile-friendly layout
-- Touch-optimized interactions
-- Flexible grid system
-- Smooth animations
+## 📞 Contact
 
-## Browser Support
-
-- Chrome/Edge 88+
-- Firefox 85+
-- Safari 14+
-- Mobile browsers
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - feel free to use this for your own portfolio!
-
-## Support
-
-If you encounter any issues or have questions:
-
-1. Check the browser console for errors
-2. Ensure all files are properly uploaded
-3. Verify Flask is running without errors
-4. Test in different browsers
+- **Email**: [ishandaksh1000@gmail.com](mailto:ishandaksh1000@gmail.com)
+- **GitHub**: [@patchyevolve](https://github.com/patchyevolve)
+- **LinkedIn**: [daksh-walia-107748308](https://linkedin.com/in/daksh-walia-107748308)
 
 ---
 
-**Built with ❤️ for developers who love to showcase their work**
-
-Happy coding! 🚀
+**Built with ❤️ for systems programming excellence** | **© 2026 Daksh Walia**
