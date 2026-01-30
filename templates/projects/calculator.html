@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .display {
+            background: #222;
+            color: #0f0;
+            padding: 15px;
+            font-size: 24px;
+            text-align: right;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 10px;
+        }
+        button {
+            padding: 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #e0e0e0;
+        }
+        button.operator {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="setOperator('/')">÷</button>
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="setOperator('*')">×</button>
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="setOperator('-')">-</button>
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="calculate()">=</button>
+            <button class="operator" onclick="setOperator('+')">+</button>
+        </div>
+    </div>
+    <script>
+        let currentValue = '0';
+        let previousValue = null;
+        let operator = null;
+        
+        function updateDisplay() {
+            document.getElementById('display').textContent = currentValue;
+        }
+        
+        function appendNumber(num) {
+            if (currentValue === '0') {
+                currentValue = num;
+            } else {
+                currentValue += num;
+            }
+            updateDisplay();
+        }
+        
+        function setOperator(op) {
+            if (previousValue === null) {
+                previousValue = parseFloat(currentValue);
+                currentValue = '0';
+            }
+            operator = op;
+        }
+        
+        function calculate() {
+            if (previousValue !== null && operator) {
+                const current = parseFloat(currentValue);
+                let result;
+                switch(operator) {
+                    case '+': result = previousValue + current; break;
+                    case '-': result = previousValue - current; break;
+                    case '*': result = previousValue * current; break;
+                    case '/': result = previousValue / current; break;
+                }
+                currentValue = result.toString();
+                previousValue = null;
+                operator = null;
+                updateDisplay();
+            }
+        }
+        
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = null;
+            operator = null;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>

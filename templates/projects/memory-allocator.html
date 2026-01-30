@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+        }
+        .allocator-demo {
+            background: #000;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 2px solid #00ff00;
+            width: 500px;
+        }
+        .terminal-header {
+            color: #00ff00;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+        .memory-block {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin: 2px;
+            border: 1px solid #333;
+            text-align: center;
+            font-size: 10px;
+            line-height: 20px;
+        }
+        .allocated { background: #ff4444; }
+        .free { background: #444444; }
+        .header { background: #00ff00; color: #000; }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .stats {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="allocator-demo">
+        <div class="terminal-header">Memory Allocator Visualization</div>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="controls">
+            <button onclick="allocateBlock(32)">malloc(32)</button>
+            <button onclick="allocateBlock(64)">malloc(64)</button>
+            <button onclick="allocateBlock(128)">malloc(128)</button>
+            <button onclick="freeRandomBlock()">free()</button>
+            <button onclick="resetHeap()">Reset</button>
+        </div>
+        <div class="stats" id="stats">
+            <div>Total Heap: 1024 bytes</div>
+            <div>Allocated: <span id="allocated">0</span> bytes</div>
+            <div>Free: <span id="free">1024</span> bytes</div>
+            <div>Fragmentation: <span id="fragmentation">0</span>%</div>
+        </div>
+    </div>
+    
+    <script>
+        const HEAP_SIZE = 1024;
+        const BLOCK_SIZE = 8;
+        const TOTAL_BLOCKS = HEAP_SIZE / BLOCK_SIZE;
+        
+        let heap = new Array(TOTAL_BLOCKS).fill(0); // 0 = free, 1 = allocated, 2 = header
+        let allocatedBlocks = [];
+        
+        function renderHeap() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < TOTAL_BLOCKS; i++) {
+                const block = document.createElement('div');
+                block.className = 'memory-block';
+                
+                if (heap[i] === 0) {
+                    block.classList.add('free');
+                    block.textContent = 'F';
+                } else if (heap[i] === 1) {
+                    block.classList.add('allocated');
+                    block.textContent = 'A';
+                } else if (heap[i] === 2) {
+                    block.classList.add('header');
+                    block.textContent = 'H';
+                }
+                
+                grid.appendChild(block);
+            }
+            
+            updateStats();
+        }
+        
+        function allocateBlock(size) {
+            const blocksNeeded = Math.ceil(size / BLOCK_SIZE) + 1; // +1 for header
+            
+            // Find free space
+            for (let i = 0; i <= TOTAL_BLOCKS - blocksNeeded; i++) {
+                let canAllocate = true;
+                for (let j = 0; j < blocksNeeded; j++) {
+                    if (heap[i + j] !== 0) {
+                        canAllocate = false;
+                        break;
+                    }
+                }
+                
+                if (canAllocate) {
+                    heap[i] = 2; // header
+                    for (let j = 1; j < blocksNeeded; j++) {
+                        heap[i + j] = 1; // allocated
+                    }
+                    allocatedBlocks.push({start: i, size: blocksNeeded});
+                    renderHeap();
+                    return;
+                }
+            }
+            
+            alert('Out of memory!');
+        }
+        
+        function freeRandomBlock() {
+            if (allocatedBlocks.length === 0) return;
+            
+            const randomIndex = Math.floor(Math.random() * allocatedBlocks.length);
+            const block = allocatedBlocks[randomIndex];
+            
+            for (let i = 0; i < block.size; i++) {
+                heap[block.start + i] = 0;
+            }
+            
+            allocatedBlocks.splice(randomIndex, 1);
+            renderHeap();
+        }
+        
+        function resetHeap() {
+            heap.fill(0);
+            allocatedBlocks = [];
+            renderHeap();
+        }
+        
+        function updateStats() {
+            const allocated = heap.filter(b => b === 1 || b === 2).length * BLOCK_SIZE;
+            const free = HEAP_SIZE - allocated;
+            
+            // Calculate fragmentation
+            let freeBlocks = 0;
+            let inFreeBlock = false;
+            for (let i = 0; i < TOTAL_BLOCKS; i++) {
+                if (heap[i] === 0 && !inFreeBlock) {
+                    freeBlocks++;
+                    inFreeBlock = true;
+                } else if (heap[i] !== 0) {
+                    inFreeBlock = false;
+                }
+            }
+            
+            const fragmentation = freeBlocks > 1 ? Math.round((freeBlocks - 1) / freeBlocks * 100) : 0;
+            
+            document.getElementById('allocated').textContent = allocated;
+            document.getElementById('free').textContent = free;
+            document.getElementById('fragmentation').textContent = fragmentation;
+        }
+        
+        // Initialize
+        renderHeap();
+    </script>
+</body>
+</html>

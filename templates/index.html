@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="root">
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-logo">&lt;daksh.systems /&gt;</div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link">_home</a></li>
+                <li><a href="#projects" class="nav-link">_projects</a></li>
+                <li><a href="#skills" class="nav-link">_skills</a></li>
+                <li><a href="#contact" class="nav-link">_contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <p class="hero-prefix">printf("Hello, World!\n");</p>
+            <h1 class="hero-title">Daksh Walia</h1>
+            <h2 class="hero-subtitle">Systems Software Engineer</h2>
+            <p class="hero-description">
+                I work on low-level and systems software with an emphasis on correctness, performance, and explicit control over memory and execution. My interests span C/C++, embedded systems, cryptographic primitives, and protocol-level design, with a focus on understanding behavior at the machine and runtime level.
+            </p>
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary">
+                    View Projects →
+                </a>
+                <a href="#contact" class="btn btn-outline">
+                    Get In Touch
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Projects Section -->
+    <section id="projects" class="section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span>&gt;</span> Interactive Projects
+            </h2>
+            <p class="section-description">
+                Live demonstrations of my work - explore the code, run it in the terminal, or see it in action
+            </p>
+        </div>
+        
+        <div class="project-viewer">
+            <!-- Project Selection Tabs -->
+            <div class="project-tabs" id="project-tabs">
+                {% for project in projects %}
+                <button class="project-tab {% if loop.first %}active{% endif %}" 
+                        data-project="{{ project.id }}" 
+                        data-index="{{ loop.index0 }}">
+                    {{ project.name }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <!-- View Type Tabs -->
+            <div class="project-tabs" style="border-top: 1px solid var(--color-border)" id="view-tabs">
+                <button class="project-tab" data-tab="code">&lt;/&gt; Code</button>
+                <button class="project-tab active" data-tab="preview">🚀 Live Preview</button>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="project-content">
+                <!-- Code Panel -->
+                <div class="project-panel" id="code-panel">
+                    <div class="code-viewer">
+                        <div class="code-header">
+                            <div class="code-filename" id="code-filename">project.js</div>
+                            <button class="code-copy-btn" id="copy-btn">Copy Code</button>
+                        </div>
+                        <div class="code-content">
+                            <pre><code id="code-content">// Loading...</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview Panel -->
+                <div class="project-panel active" id="preview-panel">
+                    <div class="iframe-container">
+                        <div class="iframe-header">
+                            <div class="terminal-button close"></div>
+                            <div class="terminal-button minimize"></div>
+                            <div class="terminal-button maximize"></div>
+                            <div class="iframe-url" id="iframe-title">Project Preview</div>
+                        </div>
+                        <iframe class="iframe-wrapper" id="project-iframe" sandbox="allow-scripts allow-same-origin allow-forms" src="about:blank"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Project Description -->
+        <div class="project-description" id="project-description">
+            <h3 id="project-name">{{ projects[0].name }}</h3>
+            <p id="project-desc">{{ projects[0].description }}</p>
+            <div class="project-tags" id="project-tags">
+                {% for tag in projects[0].tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="section" id="skills">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span>&gt;</span> Skills & Technologies
+            </h2>
+        </div>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h3>Systems Programming</h3>
+                <ul class="skill-list">
+                    <li class="skill-item">C / C++</li>
+                    <li class="skill-item">Assembly Language</li>
+                    <li class="skill-item">Memory Management</li>
+                    <li class="skill-item">Performance Optimization</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Embedded & Low-Level</h3>
+                <ul class="skill-list">
+                    <li class="skill-item">Embedded Systems</li>
+                    <li class="skill-item">Microcontrollers</li>
+                    <li class="skill-item">Real-time Systems</li>
+                    <li class="skill-item">Hardware Interfaces</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Security & Protocols</h3>
+                <ul class="skill-list">
+                    <li class="skill-item">Cryptographic Primitives</li>
+                    <li class="skill-item">Protocol Design</li>
+                    <li class="skill-item">Network Programming</li>
+                    <li class="skill-item">System Security</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact" style="background: var(--color-bg-elevated)">
+        <div class="section-header text-center">
+            <h2 class="section-title">
+                <span>&gt;</span> Get In Touch
+            </h2>
+            <p class="section-description">
+                Let's build something amazing together
+            </p>
+        </div>
+        <div style="text-align: center; margin-top: var(--spacing-lg)">
+            <a href="mailto:ishandaksh1000@gmail.com" class="btn btn-primary" style="margin-right: var(--spacing-sm)">
+                📧 Email Me
+            </a>
+            <a href="https://github.com/patchyevolve" class="btn btn-outline" target="_blank" style="margin-right: var(--spacing-sm)">
+                🐙 GitHub
+            </a>
+            <a href="https://linkedin.com/in/daksh-walia-107748308" class="btn btn-outline" target="_blank">
+                💼 LinkedIn
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- Pass projects data to JavaScript -->
+<script>
+    // Direct assignment of projects data
+    window.PROJECTS = {{ projects | tojson | safe }};
+    console.log('🚀 Projects loaded directly:', window.PROJECTS);
+    console.log('📊 Projects count:', window.PROJECTS ? window.PROJECTS.length : 0);
+</script>
+{% endblock %}

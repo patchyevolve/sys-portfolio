@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #2c1810 0%, #8b4513 100%);
+            font-family: 'Courier New', monospace;
+            color: #ffaa00;
+        }
+        .rtos-demo {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 2px solid #ffaa00;
+            width: 700px;
+        }
+        .header {
+            text-align: center;
+            color: #ffaa00;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .task {
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .task.running {
+            border-color: #00ff00;
+            background: #003300;
+            box-shadow: 0 0 15px rgba(0,255,0,0.3);
+        }
+        .task.ready {
+            border-color: #ffaa00;
+            background: #332200;
+        }
+        .task.blocked {
+            border-color: #ff4444;
+            background: #330000;
+        }
+        .task-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .task-priority {
+            font-size: 12px;
+            color: #888;
+        }
+        .task-state {
+            font-size: 11px;
+            margin-top: 5px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .state-running { background: #00ff00; color: #000; }
+        .state-ready { background: #ffaa00; color: #000; }
+        .state-blocked { background: #ff4444; color: #fff; }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #2a2a2a;
+            color: #ffaa00;
+            border: 2px solid #ffaa00;
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ffaa00;
+            color: #000;
+        }
+        .scheduler-info {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .tick-counter {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+        .cpu-usage {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .timeline {
+            height: 30px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .timeline-bar {
+            height: 100%;
+            position: absolute;
+            top: 0;
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="rtos-demo">
+        <div class="header">⚡ Real-Time OS Scheduler Demo</div>
+        
+        <div class="tick-counter">System Tick: <span id="tickCounter">0</span></div>
+        
+        <div class="task-grid" id="taskGrid">
+            <!-- Tasks will be populated by JavaScript -->
+        </div>
+        
+        <div class="timeline" id="timeline">
+            <!-- Timeline bars will be added here -->
+        </div>
+        
+        <div class="controls">
+            <button onclick="startScheduler()">Start Scheduler</button>
+            <button onclick="stopScheduler()">Stop</button>
+            <button onclick="addTask()">Add Task</button>
+            <button onclick="blockRandomTask()">Block Task</button>
+            <button onclick="resetScheduler()">Reset</button>
+        </div>
+        
+        <div class="scheduler-info">
+            <div style="color: #00ff88; margin-bottom: 10px;">📊 Scheduler Information:</div>
+            <div>Algorithm: Round-Robin with Priority</div>
+            <div>Time Slice: 100ms</div>
+            <div>Context Switch Overhead: ~5μs</div>
+            <div class="cpu-usage">
+                <span>CPU Usage: <span id="cpuUsage">0</span>%</span>
+                <span>Active Tasks: <span id="activeTasks">0</span></span>
+                <span>Context Switches: <span id="contextSwitches">0</span></span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let tasks = [];
+        let currentTaskIndex = 0;
+        let tickCounter = 0;
+        let schedulerInterval = null;
+        let contextSwitches = 0;
+        let timelinePosition = 0;
+        
+        const TASK_STATES = {
+            READY: 'ready',
+            RUNNING: 'running',
+            BLOCKED: 'blocked'
+        };
+        
+        const TASK_COLORS = {
+            'Task A': '#ff6b6b',
+            'Task B': '#4ecdc4',
+            'Task C': '#45b7d1',
+            'Task D': '#96ceb4',
+            'Task E': '#feca57'
+        };
+        
+        class Task {
+            constructor(name, priority) {
+                this.name = name;
+                this.priority = priority;
+                this.state = TASK_STATES.READY;
+                this.runtime = 0;
+                this.timeSlice = 0;
+            }
+        }
+        
+        function initializeTasks() {
+            tasks = [
+                new Task('Task A', 1),
+                new Task('Task B', 2),
+                new Task('Task C', 1),
+                new Task('Task D', 3)
+            ];
+            renderTasks();
+        }
+        
+        function renderTasks() {
+            const grid = document.getElementById('taskGrid');
+            grid.innerHTML = '';
+            
+            tasks.forEach((task, index) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = `task ${task.state}`;
+                taskDiv.innerHTML = `
+                    <div class="task-name">${task.name}</div>
+                    <div class="task-priority">Priority: ${task.priority}</div>
+                    <div class="task-state state-${task.state}">${task.state.toUpperCase()}</div>
+                    <div style="font-size: 10px; margin-top: 5px;">Runtime: ${task.runtime}ms</div>
+                `;
+                grid.appendChild(taskDiv);
+            });
+            
+            updateStats();
+        }
+        
+        function schedule() {
+            if (tasks.length === 0) return;
+            
+            // Set current task to ready
+            if (tasks[currentTaskIndex]) {
+                if (tasks[currentTaskIndex].state === TASK_STATES.RUNNING) {
+                    tasks[currentTaskIndex].state = TASK_STATES.READY;
+                }
+            }
+            
+            // Find next ready task (round-robin)
+            let nextIndex = (currentTaskIndex + 1) % tasks.length;
+            let attempts = 0;
+            
+            while (attempts < tasks.length) {
+                if (tasks[nextIndex].state === TASK_STATES.READY) {
+                    currentTaskIndex = nextIndex;
+                    tasks[currentTaskIndex].state = TASK_STATES.RUNNING;
+                    tasks[currentTaskIndex].timeSlice = 0;
+                    contextSwitches++;
+                    break;
+                }
+                nextIndex = (nextIndex + 1) % tasks.length;
+                attempts++;
+            }
+            
+            // Update timeline
+            updateTimeline();
+        }
+        
+        function updateTimeline() {
+            const timeline = document.getElementById('timeline');
+            const runningTask = tasks.find(t => t.state === TASK_STATES.RUNNING);
+            
+            if (runningTask) {
+                const bar = document.createElement('div');
+                bar.className = 'timeline-bar';
+                bar.style.left = timelinePosition + 'px';
+                bar.style.width = '10px';
+                bar.style.backgroundColor = TASK_COLORS[runningTask.name] || '#ffaa00';
+                timeline.appendChild(bar);
+                
+                timelinePosition += 10;
+                if (timelinePosition > timeline.offsetWidth) {
+                    timeline.innerHTML = '';
+                    timelinePosition = 0;
+                }
+            }
+        }
+        
+        function tick() {
+            tickCounter++;
+            document.getElementById('tickCounter').textContent = tickCounter;
+            
+            // Update running task
+            const runningTask = tasks.find(t => t.state === TASK_STATES.RUNNING);
+            if (runningTask) {
+                runningTask.runtime += 10;
+                runningTask.timeSlice += 10;
+                
+                // Time slice expired (100ms)
+                if (runningTask.timeSlice >= 100) {
+                    schedule();
+                }
+            }
+            
+            // Randomly unblock blocked tasks
+            tasks.forEach(task => {
+                if (task.state === TASK_STATES.BLOCKED && Math.random() < 0.05) {
+                    task.state = TASK_STATES.READY;
+                }
+            });
+            
+            renderTasks();
+        }
+        
+        function startScheduler() {
+            if (schedulerInterval) return;
+            
+            if (tasks.length === 0) {
+                initializeTasks();
+            }
+            
+            schedule();
+            schedulerInterval = setInterval(tick, 100);
+        }
+        
+        function stopScheduler() {
+            if (schedulerInterval) {
+                clearInterval(schedulerInterval);
+                schedulerInterval = null;
+            }
+        }
+        
+        function addTask() {
+            const taskNames = ['Task E', 'Task F', 'Task G', 'Task H'];
+            const availableName = taskNames.find(name => !tasks.some(t => t.name === name));
+            
+            if (availableName) {
+                const priority = Math.floor(Math.random() * 3) + 1;
+                tasks.push(new Task(availableName, priority));
+                renderTasks();
+            }
+        }
+        
+        function blockRandomTask() {
+            const readyTasks = tasks.filter(t => t.state === TASK_STATES.READY);
+            if (readyTasks.length > 0) {
+                const randomTask = readyTasks[Math.floor(Math.random() * readyTasks.length)];
+                randomTask.state = TASK_STATES.BLOCKED;
+                renderTasks();
+            }
+        }
+        
+        function resetScheduler() {
+            stopScheduler();
+            tasks = [];
+            currentTaskIndex = 0;
+            tickCounter = 0;
+            contextSwitches = 0;
+            timelinePosition = 0;
+            document.getElementById('timeline').innerHTML = '';
+            document.getElementById('tickCounter').textContent = '0';
+            renderTasks();
+        }
+        
+        function updateStats() {
+            const activeTasks = tasks.filter(t => t.state !== TASK_STATES.BLOCKED).length;
+            const totalRuntime = tasks.reduce((sum, task) => sum + task.runtime, 0);
+            const cpuUsage = totalRuntime > 0 ? Math.min(100, Math.round(totalRuntime / (tickCounter * 10) * 100)) : 0;
+            
+            document.getElementById('activeTasks').textContent = activeTasks;
+            document.getElementById('contextSwitches').textContent = contextSwitches;
+            document.getElementById('cpuUsage').textContent = cpuUsage;
+        }
+        
+        // Initialize
+        initializeTasks();
+    </script>
+</body>
+</html>

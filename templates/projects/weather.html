@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        .weather-card {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            min-width: 300px;
+        }
+        .city {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .temp {
+            font-size: 72px;
+            font-weight: bold;
+            color: #2193b0;
+            margin: 20px 0;
+        }
+        .description {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 30px;
+            text-transform: capitalize;
+        }
+        .details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .detail {
+            text-align: center;
+        }
+        .detail-label {
+            color: #999;
+            font-size: 14px;
+        }
+        .detail-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+        .icon {
+            font-size: 100px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-card">
+        <div class="city">San Francisco</div>
+        <div class="icon">☀️</div>
+        <div class="temp">24°C</div>
+        <div class="description">Clear Sky</div>
+        <div class="details">
+            <div class="detail">
+                <div class="detail-label">Humidity</div>
+                <div class="detail-value">65%</div>
+            </div>
+            <div class="detail">
+                <div class="detail-label">Wind</div>
+                <div class="detail-value">12 km/h</div>
+            </div>
+            <div class="detail">
+                <div class="detail-label">Feels Like</div>
+                <div class="detail-value">22°C</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

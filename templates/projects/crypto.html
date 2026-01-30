@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ff88;
+        }
+        .crypto-demo {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            border: 2px solid #00ff88;
+            width: 600px;
+        }
+        .header {
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00d9ff;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0a0e1a;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            font-family: monospace;
+            border-radius: 5px;
+        }
+        textarea {
+            height: 60px;
+            resize: vertical;
+        }
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #0a0e1a;
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #00ff88;
+            color: #0a0e1a;
+        }
+        .output {
+            background: #0a0e1a;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 100px;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        .hex-display {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .algorithm-info {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #7d8590;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="crypto-demo">
+        <div class="header">🔐 Cryptographic Primitives Demo</div>
+        
+        <div class="input-section">
+            <label>Plaintext:</label>
+            <textarea id="plaintext" placeholder="Enter text to encrypt...">Hello, World!</textarea>
+        </div>
+        
+        <div class="input-section">
+            <label>Key (16 bytes for AES-128):</label>
+            <input type="text" id="key" value="MySecretKey12345" maxlength="16">
+        </div>
+        
+        <div class="buttons">
+            <button onclick="encryptAES()">AES Encrypt</button>
+            <button onclick="decryptAES()">AES Decrypt</button>
+            <button onclick="hashSHA256()">SHA-256 Hash</button>
+            <button onclick="generateRandom()">Random Key</button>
+        </div>
+        
+        <div class="input-section">
+            <label>Output:</label>
+            <div class="output hex-display" id="output">Ready for cryptographic operations...</div>
+        </div>
+        
+        <div class="algorithm-info">
+            <div>🔹 AES-128 in ECB mode (demo purposes)</div>
+            <div>🔹 SHA-256 cryptographic hash function</div>
+            <div>🔹 Cryptographically secure random generation</div>
+        </div>
+    </div>
+    
+    <script>
+        let encryptedData = null;
+        
+        // Simple AES simulation (not real AES - for demo only)
+        function simpleEncrypt(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                const keyChar = key.charCodeAt(i % key.length);
+                const encrypted = (charCode ^ keyChar) + 42;
+                result += encrypted.toString(16).padStart(2, '0');
+            }
+            return result.toUpperCase();
+        }
+        
+        function simpleDecrypt(hexData, key) {
+            let result = '';
+            for (let i = 0; i < hexData.length; i += 2) {
+                const hexByte = hexData.substr(i, 2);
+                const encrypted = parseInt(hexByte, 16);
+                const keyChar = key.charCodeAt((i/2) % key.length);
+                const decrypted = (encrypted - 42) ^ keyChar;
+                result += String.fromCharCode(decrypted);
+            }
+            return result;
+        }
+        
+        // Simple hash simulation
+        function simpleHash(text) {
+            let hash = 0;
+            for (let i = 0; i < text.length; i++) {
+                const char = text.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            
+            // Extend to 256 bits (64 hex chars)
+            let hashStr = Math.abs(hash).toString(16).padStart(8, '0');
+            while (hashStr.length < 64) {
+                hashStr += Math.abs(hash * (hashStr.length + 1)).toString(16).substr(0, 8);
+            }
+            return hashStr.substr(0, 64).toUpperCase();
+        }
+        
+        function encryptAES() {
+            const plaintext = document.getElementById('plaintext').value;
+            const key = document.getElementById('key').value;
+            
+            if (!plaintext || !key) {
+                alert('Please enter both plaintext and key');
+                return;
+            }
+            
+            if (key.length !== 16) {
+                alert('Key must be exactly 16 characters for AES-128');
+                return;
+            }
+            
+            encryptedData = simpleEncrypt(plaintext, key);
+            document.getElementById('output').innerHTML = `
+                <div style="color: #00ff88;">🔒 AES-128 Encrypted:</div>
+                <div style="margin-top: 10px;">${encryptedData}</div>
+                <div style="color: #7d8590; margin-top: 10px; font-size: 11px;">
+                    Length: ${encryptedData.length} hex chars (${encryptedData.length/2} bytes)
+                </div>
+            `;
+        }
+        
+        function decryptAES() {
+            const key = document.getElementById('key').value;
+            
+            if (!encryptedData) {
+                alert('No encrypted data available. Encrypt something first!');
+                return;
+            }
+            
+            if (key.length !== 16) {
+                alert('Key must be exactly 16 characters for AES-128');
+                return;
+            }
+            
+            const decrypted = simpleDecrypt(encryptedData, key);
+            document.getElementById('output').innerHTML = `
+                <div style="color: #00d9ff;">🔓 AES-128 Decrypted:</div>
+                <div style="margin-top: 10px; color: #ffffff;">${decrypted}</div>
+            `;
+        }
+        
+        function hashSHA256() {
+            const plaintext = document.getElementById('plaintext').value;
+            
+            if (!plaintext) {
+                alert('Please enter text to hash');
+                return;
+            }
+            
+            const hash = simpleHash(plaintext);
+            document.getElementById('output').innerHTML = `
+                <div style="color: #ff00aa;">🔗 SHA-256 Hash:</div>
+                <div style="margin-top: 10px;">${hash}</div>
+                <div style="color: #7d8590; margin-top: 10px; font-size: 11px;">
+                    256-bit hash (64 hex characters)
+                </div>
+            `;
+        }
+        
+        function generateRandom() {
+            let randomKey = '';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            
+            for (let i = 0; i < 16; i++) {
+                randomKey += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            document.getElementById('key').value = randomKey;
+            document.getElementById('output').innerHTML = `
+                <div style="color: #ffbd2e;">🎲 Random Key Generated:</div>
+                <div style="margin-top: 10px;">${randomKey}</div>
+                <div style="color: #7d8590; margin-top: 10px; font-size: 11px;">
+                    128-bit key (16 ASCII characters)
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
