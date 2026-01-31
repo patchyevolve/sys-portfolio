@@ -126,21 +126,74 @@ class Portfolio {
         this.loadCode();
     }
     
-    loadCode() {
+    async loadCode() {
         const project = this.projects[this.currentProject];
+        const codeContainer = document.getElementById('code-content');
+        const filenameHeader = document.getElementById('code-filename');
+
         if (!project) {
-            console.error('No project found for code loading');
-            document.getElementById('code-content').textContent = '// Error: No project data available';
+            codeContainer.textContent = '// Error: No project data available';
             return;
         }
-        
-        console.log('Loading code for project:', project.name);
-        document.getElementById('code-filename').textContent = `${project.id}.c`;
-        
-        // Ensure code content exists
-        const codeContent = project.code || '// No code available for this project';
-        document.getElementById('code-content').textContent = codeContent;
+
+        // Clear previous content
+        codeContainer.innerHTML = '';
+        if (filenameHeader && !filenameHeader.textContent) {
+            filenameHeader.textContent = filename;
+        }
+
+
+        // Guard: no files
+        if (!project.code_files || project.code_files.length === 0) {
+            codeContainer.textContent = '// No code available for this project';
+            return;
+        }
+
+        // Load each file (read-only editor behavior)
+        for (const file of project.code_files) {
+            try {
+                const res = await fetch(`/source/${file}`);
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const text = await res.text();
+                const filename = file.split('/').pop();
+
+                // Update filename header to first file
+                if (!filenameHeader.textContent) {
+                    filenameHeader.textContent = filename;
+                }
+
+                const block = document.createElement('div');
+                block.className = 'code-block';
+
+                block.innerHTML = `
+                    <div class="code-file-header">${filename}</div>
+                    <pre class="code-editor"><code>${this.escapeHtml(text)}</code></pre>
+                `;
+
+                codeContainer.appendChild(block);
+
+            } catch (err) {
+                console.error('Failed to load file:', file, err);
+
+                codeContainer.innerHTML += `
+                    <pre><code>// Failed to load ${file}</code></pre>
+                `;
+            }
+        }
     }
+
+    escapeHtml(str) {
+        return str
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;');
+    }
+
+
     
     loadPreview() {
         const project = this.projects[this.currentProject];
