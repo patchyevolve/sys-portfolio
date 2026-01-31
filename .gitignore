@@ -54,13 +54,7 @@ logs/
 temp/
 tmp/
 
-# Source code files (educational C/C++ implementations)
-src/
-*.c
-*.h
-*.cpp
-*.hpp
-Makefile
+
 
 # Documentation and development files
 FIXES_APPLIED.md
