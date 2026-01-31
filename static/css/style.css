@@ -170,12 +170,12 @@ section:target {
    HERO SECTION
    ======================================== */
 .hero {
-    height: 100vh;
+    min-height: 100svh;   /* mobile-safe viewport */
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
     overflow: hidden;
+    padding-top: 80px;    
 }
 
 /* Animated grid background */
@@ -770,5 +770,12 @@ section:target {
     
     .iframe-container {
         margin: var(--spacing-sm);
+    }
+    
+    .hero {
+        min-height: auto;
+        height: auto;
+        padding-top: 100px;
+        padding-bottom: 60px;
     }
 }
