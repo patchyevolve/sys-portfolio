@@ -401,7 +401,7 @@ section:target {
 }
 
 .project-content {
-    min-height: 500px;
+    min-height: 700px;
     position: relative;
 }
 
@@ -528,7 +528,7 @@ section:target {
    For displaying live projects
    ======================================== */
 .iframe-container {
-    background: white;
+    background: var(--color-terminal-bg);
     border-radius: var(--radius-md);
     overflow: hidden;
     margin: var(--spacing-md);
@@ -557,8 +557,19 @@ section:target {
 
 .iframe-wrapper {
     width: 100%;
-    height: 500px;
+    height: 700px;
     border: none;
+    background: transparent;
+}
+
+/* Ensure iframe content displays properly */
+.iframe-container iframe {
+    display: block;
+}
+
+/* Remove any potential white space around iframe */
+.iframe-container {
+    line-height: 0;
 }
 
 /* ========================================
@@ -746,5 +757,18 @@ section:target {
     
     .nav-links {
         display: none;
+    }
+    
+    /* Responsive iframe adjustments */
+    .iframe-wrapper {
+        height: 600px;
+    }
+    
+    .project-content {
+        min-height: 600px;
+    }
+    
+    .iframe-container {
+        margin: var(--spacing-sm);
     }
 }

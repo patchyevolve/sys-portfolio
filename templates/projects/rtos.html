@@ -6,11 +6,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100%;
             margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #2c1810 0%, #8b4513 100%);
             font-family: 'Courier New', monospace;
             color: #ffaa00;
+            box-sizing: border-box;
         }
         .rtos-demo {
             background: #1a1a1a;
@@ -18,7 +20,9 @@
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
             border: 2px solid #ffaa00;
-            width: 700px;
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
         }
         .header {
             text-align: center;
@@ -28,7 +32,7 @@
         }
         .task-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -90,6 +94,20 @@
             background: #ffaa00;
             color: #000;
         }
+
+        @media (max-width: 600px) {
+            .controls {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .controls button {
+                flex: 1 1 45%;
+                max-width: 160px;
+            }
+        }
+
         .scheduler-info {
             background: #0a0a0a;
             border: 1px solid #333;
@@ -123,6 +141,41 @@
             top: 0;
             transition: all 0.2s;
         }
+
+        @media (max-width: 600px) {
+            .cpu-usage {
+                flex-direction: column;
+                gap: 4px;
+                align-items: flex-start;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                display: block;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .rtos-demo {
+                padding: 18px;
+            }
+
+            .timeline {
+                height: 22px;
+            }
+        }
+
+
     </style>
 </head>
 <body>

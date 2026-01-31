@@ -6,11 +6,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100%;
             margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
             font-family: 'Courier New', monospace;
             color: #00ff88;
+            box-sizing: border-box;
         }
         .crypto-demo {
             background: #16213e;
@@ -85,6 +87,14 @@
             color: #7d8590;
             text-align: center;
         }
+
+        @media (max-width: 768px) {
+            body {
+                display: block;
+                padding: 12px;
+            }
+        }
+
     </style>
 </head>
 <body>
