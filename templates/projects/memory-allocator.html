@@ -6,7 +6,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100%;
             margin: 0;
             padding: 20px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -64,10 +63,27 @@
         }
         @media (max-width: 768px) {
             body {
-                display: block;
+                display: block !important;
+
+                height: auto !important;
+                min-height: auto !important;
+
+                align-items: unset !important;
+                justify-content: unset !important;
+
                 padding: 12px;
+
+                overflow-y: auto;   
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .allocator-demo {
+                width: 100%;
+                max-width: 500px;
+                box-sizing: border-box;
             }
         }
+
 
     </style>
 </head>
