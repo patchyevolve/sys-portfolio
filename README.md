@@ -1,188 +1,111 @@
 # Systems Software Engineer Portfolio
 
-> **🚀 Live Demo: [https://sys-port-patchy.up.railway.app/](https://sys-port-patchy.up.railway.app/)**
+> **Live Demo:** [https://sysportfolio.netlify.app/](https://sysportfolio.netlify.app/)
 
-A modern, interactive portfolio showcasing systems programming expertise with live C/C++ project demonstrations. Built with Flask and featuring interactive visualizations of memory allocation, cryptographic primitives, and real-time operating system concepts.
+Interactive portfolio built with Flask to showcase systems programming projects. The app presents project metadata, serves real source files in a read-only code viewer, and renders interactive previews for each project.
 
-## 🎯 Featured Projects
+## Highlights
 
-### 1. **Custom Memory Allocator**
-Interactive visualization of heap management with:
-- Block allocation and deallocation
-- Fragmentation analysis
-- Real-time memory usage statistics
-- Visual heap representation
+- Flask-based portfolio UI with project cards, code tabs, and iframe previews.
+- Source-file-backed code viewer (`/source/<path>`) instead of hardcoded code snippets.
+- Project metadata API endpoints:
+  - `GET /api/projects`
+  - `GET /api/projects/<project_id>`
+- Static-site build script (`build.py`) that pre-renders pages to `_site/`.
 
-### 2. **Cryptographic Primitives**
-Live demonstration of core crypto algorithms:
-- AES-128 encryption/decryption
-- SHA-256 hashing
-- Secure random key generation
-- Interactive crypto operations
+## Featured Projects
 
-### 3. **Real-Time OS Kernel**
-RTOS scheduler simulation featuring:
-- Preemptive task scheduling
-- Priority-based round-robin algorithm
-- Context switching visualization
-- CPU usage monitoring
-- Task state management
+The current project catalog includes:
 
-## 🛠️ Technical Stack
+1. **Custom Memory Allocator** (`memory-allocator`)
+2. **Cryptographic Primitives** (`crypto-primitives`)
+3. **Real-Time OS Kernel** (`embedded-rtos`)
+4. **Stack-based VM** (`simple-vm`)
+5. **Lisp Interpreter** (`lisp-interpreter`)
+6. **C Web Server** (`web-server`)
 
-- **Backend**: Flask (Python 3.10+)
-- **Frontend**: Vanilla JavaScript, CSS3
-- **Deployment**: Railway Platform
-- **Architecture**: MVC pattern with responsive design
-- **UI/UX**: Terminal-inspired design with smooth animations
+## Tech Stack
 
-## ✨ Key Features
+- **Backend:** Flask (Python 3.10+)
+- **Frontend:** Jinja templates + vanilla JavaScript/CSS
+- **Deployment:** Netlify (live site)
+- **Build option:** Flask test-client static export via `build.py`
 
-- **🖥️ Enhanced Live Preview**: Full-height interactive project demonstrations (700px viewport)
-- **📝 Code Viewer**: Syntax-highlighted C/C++ source code with copy functionality
-- **📱 Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **⚡ Fast Loading**: Optimized assets and efficient routing
-- **🔒 Secure**: Sandboxed iframe execution with proper security headers
-- **🎨 Professional UI**: Dark theme with terminal aesthetics and smooth transitions
+## Getting Started
 
-## 🚀 Quick Start
-
-### Local Development
+### 1) Install dependencies
 
 ```bash
-# Clone the repository
-git clone https://github.com/patchyevolve/sys-portfolio.git
-cd sys-portfolio
-
-# Install dependencies
 pip install -r requirements.txt
+```
 
-# Run the application
+### 2) Run locally
+
+```bash
 python run.py
 ```
 
-Navigate to `http://localhost:5000` to view the portfolio locally.
+Then open: `http://localhost:5000`
 
-### Production Deployment
+> Alternative: `python app.py`
 
-The application is configured for easy deployment on:
-- **Railway** (current deployment)
-- **Heroku** 
-- **Render**
-- Any Python hosting platform
+## API and Routes
 
-## 📁 Project Structure
+- `/` – main portfolio page
+- `/api/projects` – all project metadata
+- `/api/projects/<project_id>` – single project metadata
+- `/project/<project_id>/preview` – project preview HTML
+- `/source/<path:filename>` – raw source-file serving for code viewer
 
+## Static Build
+
+Generate a static export into `_site/`:
+
+```bash
+python build.py
 ```
-portfolio/
-├── app.py                 # Main Flask application
-├── run.py                 # Development server
-├── requirements.txt       # Dependencies
-├── Procfile              # Railway/Heroku config
-├── runtime.txt           # Python version
+
+This will:
+
+- Pre-render the index page
+- Pre-render each project preview route
+- Copy referenced source files into `_site/source/...`
+- Copy static assets (if present)
+
+## Project Structure
+
+```text
+.
+├── app.py
+├── run.py
+├── build.py
+├── requirements.txt
+├── Procfile
 ├── templates/
-│   ├── base.html         # Base template
-│   ├── index.html        # Main portfolio
-│   └── projects/         # Interactive demos
+│   ├── base.html
+│   ├── index.html
+│   └── projects/
 │       ├── memory-allocator.html
 │       ├── crypto.html
-│       └── rtos.html
-├── static/
-│   ├── css/style.css     # Responsive styling
-│   └── js/main.js        # Interactive features
-└── .gitignore           # Excludes src/ and dev files
+│       ├── rtos.html
+│       ├── vm.html
+│       ├── lisp.html
+│       └── server.html
+└── src/
+    ├── memory-allocator/
+    ├── crypto-primitives/
+    ├── rtos-kernel/
+    ├── simple-vm/
+    ├── lisp-interpreter/
+    └── web-server/
 ```
 
-## 🎨 Recent Improvements
+## Deployment
 
-### Enhanced Live Preview (v2.0)
-- **Increased viewport height**: 700px (was 500px) for better content visibility
-- **Eliminated scrolling issues**: Projects now display at full size without internal scrolling
-- **Removed white borders**: Clean, seamless preview integration
-- **Improved responsive design**: Better mobile experience with adaptive heights
-- **Optimized iframe rendering**: Faster loading and smoother interactions
+This repository is currently deployed on Netlify at [https://sysportfolio.netlify.app/](https://sysportfolio.netlify.app/). For deployment details and platform notes, see [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
-### UI/UX Enhancements
-- **Dark theme consistency**: Removed white backgrounds from preview containers
-- **Better content fitting**: Projects designed specifically for iframe context
-- **Responsive breakpoints**: Mobile-optimized preview heights (600px on mobile)
-- **Professional aesthetics**: Terminal-inspired design with smooth animations
+## Contact
 
-## 🔧 Customization
-
-### Adding New Projects
-
-Update the `PROJECTS` list in `app.py`:
-
-```python
-PROJECTS.append({
-    'id': 'new-project',
-    'name': 'Project Name',
-    'description': 'Project description',
-    'tags': ['C', 'Systems', 'Performance'],
-    'code': '// Your C/C++ code here',
-    'preview_template': 'projects/new-project.html'
-})
-```
-
-### Styling
-
-Customize colors and themes in `static/css/style.css`:
-
-```css
-:root {
-    --color-primary: #00ff88;
-    --color-secondary: #00d9ff;
-    --color-bg: #0a0e1a;
-}
-```
-
-### Preview Template Guidelines
-
-When creating new project templates:
-
-```html
-<style>
-    body {
-        min-height: 100%; /* Not 100vh for iframe compatibility */
-        margin: 0;
-        padding: 20px;
-        box-sizing: border-box;
-        /* Your styling */
-    }
-</style>
-```
-
-## 🌐 Deployment Status
-
-- ✅ **Production**: [sys-port-patchy.up.railway.app](https://sys-port-patchy.up.railway.app/)
-- ✅ **SSL Certificate**: Enabled
-- ✅ **CDN**: Railway global edge network
-- ✅ **Monitoring**: Railway dashboard
-- ✅ **Auto-deployment**: GitHub integration
-
-## 📊 Performance Metrics
-
-- **Load Time**: < 2 seconds
-- **Lighthouse Score**: 95+ (Performance, Accessibility, SEO)
-- **Mobile Optimized**: Responsive design with touch interactions
-- **Cross-browser**: Chrome, Firefox, Safari, Edge support
-- **Interactive Demos**: Smooth 60fps animations
-
-## 🤝 About
-
-This portfolio demonstrates expertise in:
-- **Systems Programming**: C/C++, memory management, performance optimization
-- **Embedded Systems**: Real-time operating systems, microcontrollers
-- **Cryptography**: Algorithm implementation, security protocols
-- **Web Development**: Full-stack Flask applications with modern UI/UX
-
-## 📞 Contact
-
-- **Email**: [ishandaksh1000@gmail.com](mailto:ishandaksh1000@gmail.com)
-- **GitHub**: [@patchyevolve](https://github.com/patchyevolve)
-- **LinkedIn**: [daksh-walia-107748308](https://linkedin.com/in/daksh-walia-107748308)
-
----
-
-**Built with ❤️ for systems programming excellence** | **© 2026 Daksh Walia**
+- **Email:** [ishandaksh1000@gmail.com](mailto:ishandaksh1000@gmail.com)
+- **GitHub:** [@patchyevolve](https://github.com/patchyevolve)
+- **LinkedIn:** [daksh-walia-107748308](https://linkedin.com/in/daksh-walia-107748308)
