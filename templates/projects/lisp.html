@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --lisp-bg: #1a1b26;
+            --lisp-fg: #a9b1d6;
+            --lisp-accent: #7aa2f7;
+            --lisp-success: #9ece6a;
+            --lisp-error: #f7768e;
+            --lisp-warning: #e0af68;
+            --lisp-border: #414868;
+        }
+
+        body {
+            background: var(--lisp-bg);
+            color: var(--lisp-fg);
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--lisp-border);
+            padding-bottom: 5px;
+            font-size: 0.8rem;
+            color: var(--lisp-accent);
+        }
+
+        .terminal-body {
+            flex: 1;
+            background: #16161e;
+            border: 1px solid var(--lisp-border);
+            border-radius: 4px;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .output-line {
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+            animation: fadeIn 0.1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .prompt-line {
+            display: flex;
+            gap: 10px;
+        }
+
+        .prompt {
+            color: var(--lisp-accent);
+            font-weight: bold;
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--lisp-success);
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
+
+        .history-sidebar {
+            width: 200px;
+            border-left: 1px solid var(--lisp-border);
+            padding-left: 15px;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-title {
+            color: var(--lisp-warning);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        .history-item {
+            padding: 5px;
+            border-bottom: 1px solid rgba(65, 72, 104, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            color: var(--lisp-accent);
+        }
+
+        .layout {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--lisp-accent);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .history-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="terminal-header">
+        <span>LISP CORE v0.1.0-alpha</span>
+        <span>CONNECTED: localhost:2342</span>
+    </div>
+
+    <div class="layout">
+        <div class="terminal-body" id="terminal">
+            <div class="output-line" style="color: var(--lisp-warning)">TokyoNight Lisp Subsystem [READY]</div>
+            <div class="output-line">Type (help) for list of primitives.</div>
+            <div id="outputArea"></div>
+            <div class="prompt-line">
+                <span class="prompt">lisp></span>
+                <input type="text" class="input-field" id="userInput" autofocus spellcheck="false" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="history-sidebar">
+            <div class="sidebar-title">Env History</div>
+            <div id="historyList">
+                <div class="history-item">(+ 1 2)</div>
+                <div class="history-item">(defun sq (x) (* x x))</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const input = document.getElementById('userInput');
+        const outputArea = document.getElementById('outputArea');
+        const historyList = document.getElementById('historyList');
+        const terminal = document.getElementById('terminal');
+
+        let history = [];
+        let historyIndex = -1;
+
+        const userFns = {};
+        const variables = {};
+
+
+        // =====================
+        // UTILS
+        // =====================
+
+        function toNum(x) {
+            if (variables[x]) x = variables[x];
+            let n = Number(x);
+            return isNaN(n) ? x : n;
+        }
+
+        function parseArgs(str) {
+
+            if (!str.trim()) return [];
+
+            return str
+                .match(/"[^"]*"|[^\s]+/g)
+                .map(x => x.replace(/^"|"$/g, ""));
+        }
+
+
+        // =====================
+        // COMMAND REGISTRY
+        // =====================
+
+        const commands = {
+
+            "+": {
+                help: "(+ a b c ...) add",
+                fn: (...a) => a.map(toNum).reduce((p, c) => p + c, 0)
+            },
+
+            "-": {
+                help: "(- a b ...)",
+                fn: (...a) => a.map(toNum).reduce((p, c) => p - c)
+            },
+
+            "*": {
+                help: "(* a b ...)",
+                fn: (...a) => a.map(toNum).reduce((p, c) => p * c, 1)
+            },
+
+            "/": {
+                help: "(/ a b ...)",
+                fn: (...a) => a.map(toNum).reduce((p, c) => p / c)
+            },
+
+            "list": {
+                help: "(list a b c)",
+                fn: (...a) => `(${a.join(" ")})`
+            },
+
+            "echo": {
+                help: '(echo "text")',
+                fn: (...a) => a.join(" ")
+            },
+
+            "len": {
+                help: "(len a b c)",
+                fn: (...a) => a.length
+            },
+
+            "rand": {
+                help: "(rand)",
+                fn: () => Math.floor(Math.random() * 100)
+            },
+
+            "time": {
+                help: "(time)",
+                fn: () => new Date().toLocaleTimeString()
+            },
+
+            "clear": {
+                help: "(clear)",
+                fn: () => {
+                    outputArea.innerHTML = "";
+                    return "";
+                }
+            },
+
+            "version": {
+                help: "(version)",
+                fn: () => "v0.3 REPL"
+            }
+
+        };
+
+
+
+        // =====================
+        // HELP
+        // =====================
+
+        function getHelp(arg) {
+
+            if (!arg) {
+
+                let out = [];
+
+                Object.values(commands)
+                    .forEach(c => out.push(c.help));
+
+                Object.keys(variables)
+                    .forEach(v => out.push(`$${v}`));
+
+                Object.keys(userFns)
+                    .forEach(f => out.push(`(defun ${f} ...)`));
+
+                return out.join("\n");
+            }
+
+            if (commands[arg])
+                return commands[arg].help;
+
+            if (variables[arg])
+                return `$${arg} = ${variables[arg]}`;
+
+            if (userFns[arg])
+                return `<fn ${arg}>`;
+
+            return "No help";
+
+        }
+
+
+        // =====================
+        // INPUT
+        // =====================
+
+        input.addEventListener("keydown", (e) => {
+
+            if (e.key === "Enter") {
+
+                let cmd = input.value.trim();
+
+                if (!cmd) return;
+
+                processCommand(cmd);
+
+                history.unshift(cmd);
+                historyIndex = -1;
+
+                input.value = "";
+            }
+
+
+            if (e.key === "ArrowUp") {
+
+                if (historyIndex + 1 < history.length) {
+
+                    historyIndex++;
+
+                    input.value = history[historyIndex];
+                }
+            }
+
+            if (e.key === "ArrowDown") {
+
+                if (historyIndex > 0) {
+
+                    historyIndex--;
+
+                    input.value = history[historyIndex];
+
+                } else {
+
+                    historyIndex = -1;
+                    input.value = "";
+                }
+            }
+
+        });
+
+
+
+        // =====================
+        // LOG
+        // =====================
+
+        function log(text, color = 'var(--lisp-fg)') {
+
+            let line = document.createElement("div");
+
+            line.className = "output-line";
+
+            line.style.color = color;
+
+            line.textContent = text;
+
+            outputArea.appendChild(line);
+
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+
+
+        // =====================
+        // PROCESS
+        // =====================
+
+        function processCommand(cmd) {
+
+            log(`lisp> ${cmd}`, 'var(--lisp-accent)');
+
+            let h = document.createElement("div");
+
+            h.className = "history-item";
+
+            h.textContent = cmd;
+
+            h.onclick = () => input.value = cmd;
+
+            historyList.prepend(h);
+
+
+            setTimeout(() => {
+
+                try {
+
+                    let r = evaluate(cmd);
+
+                    if (r !== "")
+                        log(`=> ${r}`, 'var(--lisp-success)');
+
+                }
+                catch (e) {
+
+                    log("!! " + e.message, 'var(--lisp-error)');
+
+                }
+
+            }, 40);
+        }
+
+
+
+        // =====================
+        // EVAL
+        // =====================
+
+        function evaluate(cmd) {
+
+
+            // help
+
+            let h = cmd.match(/^\(\s*help\s*([^\)]*)\)$/);
+
+            if (h)
+                return getHelp(h[1].trim());
+
+
+            // defvar
+
+            let dv = cmd.match(/^\(\s*defvar\s+(\w+)\s+(.+)\)$/);
+
+            if (dv) {
+
+                variables[dv[1]] = dv[2];
+
+                return dv[1];
+            }
+
+
+            // read var
+
+            if (cmd.startsWith("$")) {
+
+                let n = cmd.slice(1);
+
+                return variables[n] ?? "NIL";
+            }
+
+
+            // defun fake
+
+            let df = cmd.match(/^\(\s*defun\s+(\w+)/);
+
+            if (df) {
+
+                userFns[df[1]] = true;
+
+                return df[1].toUpperCase();
+            }
+
+
+            // call
+
+            let m = cmd.match(/^\(\s*([^\s]+)\s*(.*?)\)$/);
+
+            if (!m) return "NIL";
+
+            let name = m[1];
+
+            let args = parseArgs(m[2]);
+
+
+            if (userFns[name])
+                return `<fn ${name}>`;
+
+
+            let c = commands[name];
+
+            if (!c)
+                throw new Error("Unknown: " + name);
+
+
+            return c.fn(...args);
+        }
+
+
+
+        // focus
+
+        terminal.addEventListener("click", () => input.focus());
+
+    </script>
+</body>
+
+</html>

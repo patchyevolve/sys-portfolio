@@ -22,7 +22,9 @@
             <h1 class="hero-title">Daksh Walia</h1>
             <h2 class="hero-subtitle">Systems Software Engineer</h2>
             <p class="hero-description">
-                I work on low-level and systems software with an emphasis on correctness, performance, and explicit control over memory and execution. My interests span C/C++, embedded systems, cryptographic primitives, and protocol-level design, with a focus on understanding behavior at the machine and runtime level.
+                I work on low-level and systems software with an emphasis on correctness, performance, and explicit
+                control over memory and execution. My interests span C/C++, embedded systems, cryptographic primitives,
+                and protocol-level design, with a focus on understanding behavior at the machine and runtime level.
             </p>
             <div class="hero-cta">
                 <a href="#projects" class="btn btn-primary">
@@ -45,25 +47,24 @@
                 Live demonstrations of my work - explore the code, run it in the terminal, or see it in action
             </p>
         </div>
-        
+
         <div class="project-viewer">
             <!-- Project Selection Tabs -->
             <div class="project-tabs" id="project-tabs">
                 {% for project in projects %}
-                <button class="project-tab {% if loop.first %}active{% endif %}" 
-                        data-project="{{ project.id }}" 
-                        data-index="{{ loop.index0 }}">
+                <button class="project-tab {% if loop.first %}active{% endif %}" data-project="{{ project.id }}"
+                    data-index="{{ loop.index0 }}">
                     {{ project.name }}
                 </button>
                 {% endfor %}
             </div>
-            
+
             <!-- View Type Tabs -->
             <div class="project-tabs" style="border-top: 1px solid var(--color-border)" id="view-tabs">
                 <button class="project-tab" data-tab="code">&lt;/&gt; Code</button>
                 <button class="project-tab active" data-tab="preview">🚀 Live Preview</button>
             </div>
-            
+
             <!-- Content Area -->
             <div class="project-content">
                 <!-- Code Panel -->
@@ -78,7 +79,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Preview Panel -->
                 <div class="project-panel active" id="preview-panel">
                     <div class="iframe-container">
@@ -88,12 +89,13 @@
                             <div class="terminal-button maximize"></div>
                             <div class="iframe-url" id="iframe-title">Project Preview</div>
                         </div>
-                        <iframe class="iframe-wrapper" id="project-iframe" sandbox="allow-scripts allow-same-origin allow-forms" src="about:blank"></iframe>
+                        <iframe class="iframe-wrapper" id="project-iframe"
+                            sandbox="allow-scripts allow-same-origin allow-forms" src="about:blank"></iframe>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Project Description -->
         <div class="project-description" id="project-description">
             <h3 id="project-name">{{ projects[0].name }}</h3>
@@ -154,11 +156,11 @@
                 Let's build something amazing together
             </p>
         </div>
-        <div style="text-align: center; margin-top: var(--spacing-lg)">
-            <a href="mailto:ishandaksh1000@gmail.com" class="btn btn-primary" style="margin-right: var(--spacing-sm)">
+        <div class="contact-actions">
+            <a href="mailto:ishandaksh1000@gmail.com" class="btn btn-primary">
                 📧 Email Me
             </a>
-            <a href="https://github.com/patchyevolve" class="btn btn-outline" target="_blank" style="margin-right: var(--spacing-sm)">
+            <a href="https://github.com/patchyevolve" class="btn btn-outline" target="_blank">
                 🐙 GitHub
             </a>
             <a href="https://linkedin.com/in/daksh-walia-107748308" class="btn btn-outline" target="_blank">

@@ -55,6 +55,48 @@ PROJECTS = [
         ],
 
         'preview_template': 'projects/rtos.html'
+    },
+
+    {
+        'id': 'simple-vm',
+        'name': 'Stack-based VM',
+        'description': 'Simple stack-based virtual machine with custom opcode handling and register file.',
+        'tags': ['C', 'Virtual Machine', 'Systems'],
+        'tabs': ['code', 'preview'],
+
+        'code_files': [
+            'src/simple-vm/vm.c',
+        ],
+
+        'preview_template': 'projects/vm.html'
+    },
+
+    {
+        'id': 'lisp-interpreter',
+        'name': 'Lisp Interpreter',
+        'description': 'Minimal Lisp interpreter in C with support for basic S-expressions and evaluation.',
+        'tags': ['C', 'Compilers', 'Lisp'],
+        'tabs': ['code', 'preview'],
+
+        'code_files': [
+            'src/lisp-interpreter/interpreter.c',
+        ],
+
+        'preview_template': 'projects/lisp.html'
+    },
+
+    {
+        'id': 'web-server',
+        'name': 'C Web Server',
+        'description': 'Basic socket-based HTTP server implemented in C for pedagogical purposes.',
+        'tags': ['C', 'Networking', 'HTTP'],
+        'tabs': ['code', 'preview'],
+
+        'code_files': [
+            'src/web-server/server.c',
+        ],
+
+        'preview_template': 'projects/server.html'
     }
 ]
 

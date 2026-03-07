@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --srv-bg: #0b0e14;
+            --srv-panel: #1a1f26;
+            --srv-accent: #00ff88;
+            --srv-secondary: #00d9ff;
+            --srv-error: #ff4444;
+            --srv-text: #e6edf3;
+            --srv-border: #30363d;
+        }
+
+        body {
+            background: var(--srv-bg);
+            color: var(--srv-text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .monitor-pane {
+            flex: 1;
+            background: var(--srv-panel);
+            border: 1px solid var(--srv-border);
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: #000;
+            border: 2px solid var(--srv-accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--srv-accent);
+            letter-spacing: 1px;
+        }
+
+        .packet {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--srv-secondary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--srv-secondary);
+            display: none;
+            z-index: 5;
+        }
+
+        .log-pane {
+            height: 150px;
+            background: #000;
+            border: 1px solid var(--srv-border);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            color: #ccc;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .log-meth {
+            color: var(--srv-accent);
+            font-weight: bold;
+        }
+
+        .log-path {
+            color: var(--srv-secondary);
+        }
+
+        .log-stat {
+            color: #888;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--srv-accent);
+            color: var(--srv-accent);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--srv-accent);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
+        @keyframes travelForward {
+            from {
+                left: 25%;
+                opacity: 1;
+            }
+
+            to {
+                left: 75%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes travelBackward {
+            from {
+                left: 75%;
+                opacity: 1;
+            }
+
+            to {
+                left: 25%;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="monitor-pane" id="monitor">
+        <div class="node">
+            <div class="icon-box">💻</div>
+            <div class="label">CLIENT</div>
+        </div>
+
+        <div class="packet" id="packet"></div>
+
+        <div class="node">
+            <div class="icon-box">🛡️</div>
+            <div class="label">SERVER:80</div>
+        </div>
+    </div>
+
+    <div class="log-pane" id="logs">
+        <div class="log-entry">SYSTEM [INFO]: Server listening on 0.0.0.0:80</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="sendReq('GET', '/index.html')">FETCH INDEX</button>
+        <button class="btn" onclick="sendReq('POST', '/api/data')">POST DATA</button>
+        <button class="btn" onclick="sendReq('GET', '/static/style.css')">FETCH CSS</button>
+    </div>
+
+    <script>
+        const packet = document.getElementById('packet');
+        const logs = document.getElementById('logs');
+
+        function addLog(meth, path, stat) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const now = new Date().toLocaleTimeString();
+            entry.innerHTML = `[${now}] <span class="log-meth">${meth}</span> <span class="log-path">${path}</span> - <span class="log-stat">${stat}</span>`;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function animatePacket(dir, callback) {
+            packet.style.display = 'block';
+            packet.style.top = '50%';
+            packet.style.animation = 'none';
+            packet.offsetHeight; // trigger reflow
+            packet.style.animation = dir === 'forward' ? 'travelForward 0.8s ease-in-out' : 'travelBackward 0.8s ease-in-out';
+
+            setTimeout(() => {
+                packet.style.display = 'none';
+                if (callback) callback();
+            }, 800);
+        }
+
+        function sendReq(meth, path) {
+            animatePacket('forward', () => {
+                const status = Math.random() > 0.1 ? '200 OK' : '404 NOT FOUND';
+                addLog(meth, path, status);
+                setTimeout(() => {
+                    animatePacket('backward');
+                }, 200);
+            });
+        }
+    </script>
+</body>
+
+</html>

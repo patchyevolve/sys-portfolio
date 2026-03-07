@@ -327,6 +327,14 @@ section:target {
     box-shadow: 0 0 30px var(--color-primary-glow);
 }
 
+.contact-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--spacing-lg);
+}
+
 /* ========================================
    SECTION CONTAINER
    ======================================== */
